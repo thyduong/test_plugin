@@ -1,33 +1,31 @@
-from django.apps import AppConfig
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django.apps import AppConfig
 
-from pretix import __version__ as version
+from . import __version__
+
+try:
+    from pretix.base.plugins import PluginConfig
+except ImportError:
+    raise RuntimeError("Python package 'stripe' is not installed.")
 
 
-class StripeApp(AppConfig):
-    name = 'pretix.plugins.stripe'
-    verbose_name = _("Stripe")
+class StripeApp2(AppConfig):
+    default = True
+    name = 'pretix.plugins.stripe2'
+    verbose_name = _("Stripe2")
 
     class PretixPluginMeta:
-        name = _("Stripe")
-        author = _("the pretix team")
-        version = version
+        name = _("Stripe2")
+        author = "eventyay"
+        version = __version__
         category = 'PAYMENT'
+        featured = True
+        visible = True
         description = _("This plugin allows you to receive credit card payments " +
-                        "via Stripe")
+                        "via Stripe.")
 
     def ready(self):
         from . import signals, tasks  # NOQA
 
-    @cached_property
-    def compatibility_errors(self):
-        errs = []
-        try:
-            import stripe  # NOQA
-        except ImportError:
-            errs.append("Python package 'stripe' is not installed.")
-        return errs
 
-
-default_app_config = 'pretix.plugins.stripe.StripeApp'
+default_app_config = 'pretix.plugins.stripe2.StripeApp2'
